@@ -54,7 +54,7 @@ export default {
   methods: {
     register() {
       if (this.password != this.confirm_password) {
-        this.$store.dispatch("alert", ["Password mismatch", "red darken-1 white--text"]);
+        this.$store.dispatch("alert", ["Password mismatch"]);
         return;
       }
 
@@ -65,12 +65,12 @@ export default {
         })
         .then(() => {
           this.$store.dispatch("GET_USER");
-          this.$store.dispatch("alert", [ "Success!", "success" ]);
+          this.$store.dispatch("alert", ["Success!", "success"]);
           this.$router.push("/");
           this.$router.go();
         })
         .catch((err) => {
-          this.$store.dispatch("alert", [ err.response.data.error, "red darken-1 white--text" ]);
+          this.$store.dispatch("alert", [err.response.data.error]);
         });
     },
   },

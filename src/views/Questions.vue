@@ -52,7 +52,7 @@
         </v-col>
       </v-col>
 
-      <v-col cols="12">
+      <v-col cols="12" v-if="user && user.name">
         <v-card width="95%" class="mx-auto">
           <h1>Your answer</h1>
           <v-card-text>
@@ -149,6 +149,9 @@ export default {
     console.log(response.data.content);
   },
   computed: {
+    user() {
+      return this.$store.getters.user;
+    },
     answerQuill() {
       return this.$refs.Answer.quill;
     },

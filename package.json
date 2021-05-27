@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "server": "nodemon server --ignore 'src/*'"
+    "server": "nodemon server --ignore 'src/*' --ignore 'dist/*'"
   },
   "dependencies": {
     "axios": "^0.21.1",

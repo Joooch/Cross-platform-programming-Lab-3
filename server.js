@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const app = express();
-
+const history = require('connect-history-api-fallback')
 
 const User = require("./models/User");
 const Question = require("./models/Question");
@@ -17,6 +17,9 @@ const salt = "mHMCZANnxg"
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+app.use(express.static(__dirname + '/dist'));
+app.use(history());
 
 app.use('/imgs', express.static(__dirname + '/imgs'));
 app.use(cors());
@@ -35,25 +38,13 @@ async function getUser(info) {
 }
 
 app.get("/list", (req, res) => {
-	// setTimeout(() => {
-	// 	res.status(200).json({
-	// 		"id1": {
-	// 			title: "Test 1",
-	// 			username: "User 1"
-	// 		},
-	// 		"id2": {
-	// 			title: "Test 2",
-	// 			username: "User 2"
-	// 		}
-	// 	})
-	// }, 1000);
 
 	Question.find({}).sort({ date: -1 }).populate("user", "-password -_id -__v").select("-__v").then(questions => {
 		if (!questions) {
 			return Promise.reject("Unknown error")
 		}
-		res.status( 200 ).json( questions );
-		
+		res.status(200).json(questions);
+
 	}).catch((err) => {
 		res.status(400).send({
 			error: err
@@ -96,10 +87,6 @@ app.post("/register", (req, res) => {
 })
 
 app.get("/user", async (req, res) => {
-	// res.status(200).json({
-	// 	name: "Test",
-	// 	icon: "user.jpg"
-	// })
 
 	let user;
 	if (req.session.userid) {
@@ -138,7 +125,7 @@ app.post("/makeAnswer", async (req, res) => {
 	const newAnswer = new Answer({
 		question: req.body.id,
 		user: user._id,
-		content: req.body.content,	
+		content: req.body.content,
 	});
 	newAnswer.save((err) => {
 		if (err) {
@@ -206,7 +193,7 @@ app.get("/getQuestion/:id", (req, res) => {
 				return Promise.reject("Invalid question")
 			}
 
-			Question.findOneAndUpdate({ _id: question._id }, { $inc: { views: 1 } }, {new: true } ).exec();
+			Question.findOneAndUpdate({ _id: question._id }, { $inc: { views: 1 } }, { new: true }).exec();
 
 			Answer.find({
 				question: question._id
@@ -232,6 +219,11 @@ app.get("/getQuestion/:id", (req, res) => {
 			});
 		})
 })
+
+
+app.get("/*", (req, res) => {
+	res.sendFile(__dirname + "/dist/index.html")
+});
 
 
 mongoose.connect('mongodb://localhost:27017/overflow', {

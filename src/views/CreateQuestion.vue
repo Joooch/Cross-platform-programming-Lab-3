@@ -28,16 +28,12 @@
 </template>
 
 <script>
-// import Quill from "quill";
-// import someModule from "../plugins/quillEditor.js";
-// Quill.register("quill-editor", someModule);
-
 export default {
   name: "test",
   data() {
     return {
       config: {
-        theme: "snow", // bubble
+        theme: "snow",
       },
       title: "",
       content: '<h2>Hello world</h2><p><img src="/kitty.gif"></p>',
@@ -48,23 +44,19 @@ export default {
       console.log(html);
     },
     async doPost() {
-      //this.config.theme = "bubble"
       this.editor.disable();
       const id = await this.$store.dispatch("createQuestion", {
         title: this.title,
         content: JSON.stringify(this.editor.getContents()),
       });
 
-      this.$router.push( '/questions/' + id );
+      this.$router.push("/questions/" + id);
     },
   },
   computed: {
     editor() {
       return this.$refs.Editor.quill;
     },
-  },
-  mounted() {
-    console.log("this is current quill instance object", this.editor);
   },
 };
 </script>

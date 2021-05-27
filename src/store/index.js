@@ -16,18 +16,18 @@ export default new Vuex.Store({
 		}
 	},
 	mutations: {
-		SET_USER: (state, payload) => {
+		setUser: (state, payload) => {
 			payload.icon = payload.icon || "/user.jpg";
 			state.user = payload;
 		},
-		SET_LIST: (state, payload) => {
+		setQuestions_list: (state, payload) => {
 			state.list = payload;
 		},
 
-		SET_ALERT: (state, payload) => {
+		setAlert: (state, payload) => {
 			state.alert.active = true;
 			state.alert.text = payload[0];
-			state.alert.color = payload[1];
+			state.alert.color = payload[1] ? payload[1] : "red darken-1 white--text";
 		},
 	},
 	getters: {
@@ -42,17 +42,17 @@ export default new Vuex.Store({
 		}
 	},
 	actions: {
-		GET_USER: async (context) => {
+		getUser: async (context) => {
 			await axios.get('/user')
 				.then(res => {
 					if (res.status == 200 && res.data.name) {
-						context.commit('SET_USER', res.data);
+						context.commit('setUser', res.data);
 					}
 				}).catch(console.error);
 		},
-		GET_LIST: async (context) => {
+		getQuestionsList: async (context) => {
 			let response = await axios.get('/list');
-			context.commit('SET_LIST', response.data);
+			context.commit('setQuestions_list', response.data);
 		},
 
 		logout: async () => {
@@ -71,29 +71,25 @@ export default new Vuex.Store({
 			});
 		},
 		alert: (context, payload) => {
-			context.commit('SET_ALERT', payload);
+			context.commit('setAlert', payload);
 		},
 
 		getQuestion: async (context, payload) => {
 			return await axios.get( "/getQuestion/" + payload.id ).catch( err => {
-				context.commit('SET_ALERT', [err, "error"]);
+				context.commit('setAlert', [err]);
 			})
 		},
 		createQuestion: async (context, payload) => {
 			return await axios.post("/createQuestion", payload).catch((err) => {
-				context.commit('SET_ALERT', [err, "error"]);
+				context.commit('setAlert', [err]);
 			}).then( res => {
-				console.log(res);
-				console.log(res.data.id);
 				return res.data.id
 			});
 		},
 		makeAnswer: async (context, payload) => {
 			return await axios.post("/makeAnswer", payload).catch((err) => {
-				context.commit('SET_ALERT', [err, "error"]);
+				context.commit('setAlert', [err]);
 			}).then( res => {
-				console.log(res);
-				console.log(res.data.id);
 				return res.data
 			});
 		}

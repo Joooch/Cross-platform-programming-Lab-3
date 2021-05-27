@@ -53,15 +53,12 @@ export default {
           password: this.password,
         })
         .then(() => {
-          this.$store.dispatch("GET_USER");
+          this.$store.dispatch("getUser");
           this.$router.push("/");
           this.$router.go();
         })
         .catch((err) => {
-          this.$store.dispatch("alert", [
-            err.response.data.error,
-            "red darken-1 white--text",
-          ]);
+          this.$store.dispatch("alert", [err.response.data.error]);
         });
     },
   },
