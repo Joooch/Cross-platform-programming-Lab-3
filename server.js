@@ -18,9 +18,6 @@ const salt = "mHMCZANnxg"
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use(express.static(__dirname + '/dist'));
-app.use(history());
-
 app.use('/imgs', express.static(__dirname + '/imgs'));
 app.use(cors());
 app.use(session({
@@ -37,9 +34,8 @@ async function getUser(info) {
 	return await User.findOne(info);
 }
 
-app.get("/list", (req, res) => {
-
-	Question.find({}).sort({ date: -1 }).populate("user", "-password -_id -__v").select("-__v").then(questions => {
+app.get("/question/list", (req, res) => {
+	Question.find({}).sort({ date: -1 }).populate("user", "-password -_id -__v").select("-__v -content").then(questions => {
 		if (!questions) {
 			return Promise.reject("Unknown error")
 		}
@@ -52,28 +48,30 @@ app.get("/list", (req, res) => {
 	})
 });
 
-app.post("/login", (req, res) => {
-	User.findOne({
-		name: req.body.name,
-		password: sha1(salt + req.body.password + salt),
-	}).then(user => {
-		if (!user) {
-			return res.status(401).send({
-				error: "Invalid username or password"
-			});
-		}
-
-		req.session.userid = user._id;
-
-		res.status(200).send();
-	})
+app.get("/user", async (req, res) => {
+	
+	let user;
+	if (req.session.userid) {
+		user = await getUser({
+			_id: req.session.userid,
+			password: req.session.password,
+		})
+	}
+	if (user && user.name) {
+		res.status(200).send({
+			name: user.name,
+			icon: "user.jpg"
+		})
+	} else {
+		res.status(400).send()
+	}
 })
-app.post("/register", (req, res) => {
+app.post("/user/register", (req, res) => {
 	const newUser = new User({
 		name: req.body.name,
 		password: sha1(salt + req.body.password + salt),
 	})
-
+	
 	newUser.save((err, user) => {
 		if (err) {
 			return res.status(400).send({
@@ -85,30 +83,30 @@ app.post("/register", (req, res) => {
 	})
 })
 
-app.get("/user", async (req, res) => {
+app.post("/user/login", async (req, res) => {
+	const user = await getUser({
+		name: req.body.name,
+		password: sha1(salt + req.body.password + salt),
+	})
 
-	let user;
-	if (req.session.userid) {
-		user = await getUser({
-			_id: req.session.userid
-		})
+	if (!user || !user.name) {
+		return res.status(400).send({
+			error: "Invalid username or password"
+		});
 	}
-	if (user && user.name) {
-		res.status(200).send({
-			name: user.name,
-			icon: "user.jpg"
-		})
-	} else {
-		res.status(401).send()
-	}
+
+	req.session.userid = user._id;
+	req.session.password = user.password;
+
+	res.status(200).send();
 })
-app.post("/logout", (req, res) => {
+app.post("/user/logout", (req, res) => {
 	req.session.userid = undefined;
 	res.status(200).send();
 });
 
 
-app.post("/makeAnswer", async (req, res) => {
+app.post("/question/makeAnswer", async (req, res) => {
 	let user;
 	if (req.session.userid) {
 		user = await getUser({
@@ -148,7 +146,7 @@ app.post("/makeAnswer", async (req, res) => {
 	})
 })
 
-app.post("/createQuestion", async (req, res) => {
+app.post("/question/create", async (req, res) => {
 	let user;
 	if (req.session.userid) {
 		user = await getUser({
@@ -181,7 +179,7 @@ app.post("/createQuestion", async (req, res) => {
 	})
 })
 
-app.get("/getQuestion/:id", (req, res) => {
+app.get("/question/get/:id", (req, res) => {
 	Question.findOne({
 		_id: req.params.id
 	}).populate("user", "-password -_id -__v")
@@ -218,7 +216,9 @@ app.get("/getQuestion/:id", (req, res) => {
 })
 
 
-app.get("/*", (req, res) => {
+app.use(express.static(__dirname + '/dist'));
+app.use(history());
+app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/dist/index.html")
 });
 

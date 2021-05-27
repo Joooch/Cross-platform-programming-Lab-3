@@ -51,21 +51,21 @@ export default new Vuex.Store({
 				}).catch(console.error);
 		},
 		getQuestionsList: async (context) => {
-			let response = await axios.get('/list');
+			let response = await axios.get('/question/list');
 			context.commit('setQuestions_list', response.data);
 		},
 
 		logout: async () => {
-			return await axios.post("/logout");
+			return await axios.post("/user/logout");
 		},
 		register: (context, payload) => {
-			return axios.post("register", {
+			return axios.post("/user/register", {
 				name: payload.name,
 				password: payload.password,
 			})
 		},
 		login: (context, payload) => {
-			return axios.post("/login", {
+			return axios.post("/user/login", {
 				name: payload.name,
 				password: payload.password
 			});
@@ -75,19 +75,19 @@ export default new Vuex.Store({
 		},
 
 		getQuestion: async (context, payload) => {
-			return await axios.get( "/getQuestion/" + payload.id ).catch( err => {
+			return await axios.get( "/question/get/" + payload.id ).catch( err => {
 				context.commit('setAlert', [err]);
 			})
 		},
 		createQuestion: async (context, payload) => {
-			return await axios.post("/createQuestion", payload).catch((err) => {
+			return await axios.post("/question/create", payload).catch((err) => {
 				context.commit('setAlert', [err]);
 			}).then( res => {
 				return res.data.id
 			});
 		},
 		makeAnswer: async (context, payload) => {
-			return await axios.post("/makeAnswer", payload).catch((err) => {
+			return await axios.post("/question/makeAnswer", payload).catch((err) => {
 				context.commit('setAlert', [err]);
 			}).then( res => {
 				return res.data
