@@ -63,7 +63,6 @@ app.post("/login", (req, res) => {
 			});
 		}
 
-		console.log("authed: ", user);
 		req.session.userid = user._id;
 
 		res.status(200).send();
@@ -175,8 +174,6 @@ app.post("/createQuestion", async (req, res) => {
 				error: "Something went wrong! Try later."
 			});
 		}
-
-		console.log(question._id, "created;")
 
 		res.status(200).send({
 			id: question._id

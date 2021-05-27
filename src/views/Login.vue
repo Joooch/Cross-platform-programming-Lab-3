@@ -53,7 +53,7 @@ export default {
           password: this.password,
         })
         .then(() => {
-          this.$store.dispatch("getUser");
+          this.$store.dispatch("alert", ["Success!", "success"]);
           this.$router.push("/");
           this.$router.go();
         })

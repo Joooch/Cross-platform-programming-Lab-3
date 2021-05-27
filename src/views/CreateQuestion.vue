@@ -12,7 +12,6 @@
           ref="Editor"
           :options="config"
           :content="content"
-          @change="onEditorChange($event)"
         />
         <v-divider class="my-2"></v-divider>
       </v-card-text>
@@ -40,9 +39,6 @@ export default {
     };
   },
   methods: {
-    onEditorChange({ html }) {
-      console.log(html);
-    },
     async doPost() {
       this.editor.disable();
       const id = await this.$store.dispatch("createQuestion", {

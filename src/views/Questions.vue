@@ -91,14 +91,11 @@ export default {
     };
   },
   methods: {
-    onEditorReady(quill, key, s2) {
-      console.log("im ready", s2, key, quill);
+    onEditorReady(quill, key) {
       if (key != undefined) {
         this.answers[key].quill = quill;
-        console.log(key, "ready;");
         if (this.answers[key].JSONContent) {
           quill.setContents(this.answers[key].JSONContent);
-          console.log("SET CONTENT", this.answers[key].JSONContent);
         }
       }
       quill.disable();
@@ -127,7 +124,6 @@ export default {
     });
 
     if (!response) {
-      console.log("leave!");
       this.$router.push("/");
       return;
     }
@@ -145,8 +141,6 @@ export default {
     }
 
     this.answers = response.data.answers;
-
-    console.log(response.data.content);
   },
   computed: {
     user() {
